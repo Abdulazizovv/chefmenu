@@ -1,0 +1,96 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% block title %}
+{{ kitchen.title }} | Menu
+{% endblock title %}
+
+{% block content %}
+<style>
+    .container1 {
+        padding: 20px;
+    }
+
+    .header {
+        border-bottom: 2px solid #ccc;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding-bottom: 20px;
+    }
+
+    .header h2.text {
+        font-size: 24px;
+        color: #333;
+        margin: 0;
+    }
+
+    .categories .list-group-item {
+        background-color: #fff;
+        border: none;
+        margin-bottom: 10px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+        cursor: pointer; /* Add pointer cursor to indicate clickable */
+    }
+
+    .categories .list-group-item:hover {
+        background-color: #f0f0f0; /* Change background color on hover */
+    }
+
+    .btn-floating {
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+    }
+
+    .btn-floating i {
+        font-size: 24px;
+    }
+
+    .category-title {
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
+
+    .category-description {
+        color: #6c757d; /* Dark gray text color for description */
+        margin-top: 5px;
+    }
+</style>
+
+<div class="container1 container pb-5">
+    <div class="header">
+        <div class="card"></div>
+        <h2 class="text">{{ kitchen.title }}</h2>
+    </div>
+    
+    <div class="row">
+        <div class="col">
+            <div class="categories">
+                <ul class="list-group">
+                    {% for category in categories %}
+                    <li class="list-group-item">
+                        <a href="{% url 'menu:all_foods' %}#{{ category.slug }}" class="category-link">
+                            <div class="d-flex align-items-center">
+                                <div class="btn text-white btn-floating m-1 me-3" style="background-color: hsl(330, 70%, 50%);">
+                                    <i class="fas fa-utensils fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h3 class="category-title">{{ category.title }}</h3>
+                                    <p class="category-description">{{ category.description }}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rest of your HTML content -->
+
+{% endblock content %}

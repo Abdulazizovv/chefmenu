@@ -1,0 +1,96 @@
+<div class="modal fade" id="addFoodModal1" tabindex="-1" aria-labelledby="addFoodModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addFoodModalLabel">Taom qo'shish</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addFoodForm" method="post" action="{% url 'menu:add_food' %}" enctype="multipart/form-data"> {% csrf_token %}
+          <div class="mb-3">
+            <label for="foodName" class="form-label">Taom Nomi:</label>
+            <input type="text" class="form-control" id="foodName" name="foodName" required>
+          </div>
+          <div class="mb-3">
+            <label for="foodDescription" class="form-label">Taom Tavsifi:</label>
+            <textarea class="form-control" id="foodDescription" name="foodDescription" rows="3"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="foodPrice" class="form-label">Taom Narxi:</label>
+            <input type="number" class="form-control" id="foodPrice" name="foodPrice" step="1" required>
+          </div>
+          <div class="mb-3">
+            <label for="foodImage" class="form-label">Taom Rasm:</label>
+            <input type="file" class="form-control" id="foodImage" name="foodImage" accept="image/*">
+          </div>
+          {% comment %} <div class="form-check form-switch m-3">
+            <input class="form-check-input" type="checkbox" id="hasVariants" name="hasVariants">
+            <label class="form-check-label" for="hasVariants">Turlar mavjudmi?</label>
+          </div> {% endcomment %}
+          <input type="hidden" name="foodCategory" value="{{category.id}}">
+          <input type="hidden" name="redirectUrl" value="{{category.slug}}">
+          <div id="foodVariantsSection" class="collapse">
+            <h6 class="mb-3">Taom Turlari</h6>
+            <div id="variantContainer"></div>
+            <button type="button" class="btn btn-success btn-sm mt-3" id="addVariantBtn"><i class="fas fa-plus"></i> Tur qo'shish</button>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
+          <button type="submit" class="btn btn-primary" id="saveFoodBtn">Taomni saqlash</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const hasVariantsCheckbox = document.getElementById('hasVariants');
+  const foodVariantsSection = document.getElementById('foodVariantsSection');
+  const addVariantBtn = document.getElementById('addVariantBtn');
+  const variantContainer = document.getElementById('variantContainer');
+  const addFoodForm = document.getElementById('addFoodForm');
+
+  hasVariantsCheckbox.addEventListener('change', function() {
+    foodVariantsSection.classList.toggle('show', this.checked);
+  });
+
+  let variantCount = 1;
+
+  addVariantBtn.addEventListener('click', function() {
+    const variantHTML = `
+      <div class="variant-section mb-3">
+        <button type="button" class="btn btn-danger btn-sm float-end remove-variant-btn mb-2"><i class="fas fa-times"></i> O'chirish</button>
+        <div class="mb-3">
+          <label for="variantName${variantCount}" class="form-label">Tur Nomi:</label>
+          <input type="text" class="form-control" id="variantName${variantCount}" name="variantNames[]" required>
+        </div>
+        <div class="mb-3">
+          <label for="variantDescription${variantCount}" class="form-label">Tur Tavsifi:</label>
+          <textarea class="form-control" id="variantDescription${variantCount}" name="variantDescriptions[]" rows="3"></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="variantPrice${variantCount}" class="form-label">Tur Narxi:</label>
+          <input type="number" class="form-control" id="variantPrice${variantCount}" name="variantPrices[]" step="" required>
+        </div>
+        <div class="mb-3">
+          <label for="variantImage${variantCount}" class="form-label">Tur Rasm:</label>
+          <input type="file" class="form-control" id="variantImage${variantCount}" name="variantImages[]" accept="image/*">
+        </div>
+      </div>
+    `;
+    variantContainer.insertAdjacentHTML('beforeend', variantHTML);
+    variantCount++;
+  });
+
+  variantContainer.addEventListener('click', function(event) {
+    if (event.target.classList.contains('remove-variant-btn')) {
+      event.target.closest('.variant-section').remove();
+    }
+  });
+
+  // Formni yuborishni belgilash
+  document.getElementById('saveFoodBtn').addEventListener('click', function() {
+    addFoodForm.submit();
+  });
+</script>

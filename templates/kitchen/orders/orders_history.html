@@ -1,0 +1,188 @@
+{% extends "kitchen/base.html" %}
+
+{% block title %}
+Buyurtmalar tarixi
+{% endblock title %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <h1 class="h3 mb-2 text-gray-800">Barcha buyurtmalar</h1>
+    <p class="mb-4">Bu yerda barcha buyurtmalar ko'rinadi</p>
+
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            {% comment %} <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6> {% endcomment %}
+        </div>
+
+        <div class="card-body">
+            <!-- Filter Section -->
+            <div class="filter-section mb-4">
+                <form action="" method="get" id="filterForm">
+                <!-- Filter by Date -->
+                <div class="mb-3">
+                        <label for="dateFilter" class="form-label">Sana:</label>
+                        <input type="date" id="dateFilter" name="date" class="form-control">
+                </div>
+                <!-- Filter by Status -->
+                <div class="mb-3">
+                    <label for="statusFilter" class="form-label">Status:</label>
+                    <select id="statusFilter" class="form-select" name="status">
+                        <option value="">Hammasi</option>
+                        <option value="new" {% if selected_status == 'new' %}selected{% endif %}>Yangi</option>
+                        <option value="in_progress" {% if selected_status == 'in_progress' %}selected{% endif %}>Tayyorlanmoqda</option>
+                        <option value="done" {% if selected_status == 'done' %}selected{% endif %}>Yetkazildi</option>
+                    </select>
+                </div>
+                <!-- Filter by Table -->
+                <div class="mb-3">
+                    <label for="tableFilter" class="form-label">Stol orqali filtrlash:</label>
+                    <select id="tableFilter" class="form-control" name="table">
+                        <option value="">Hammasi</option>
+                        {% for table in tables %}
+                        <option value="{{table.id}}" {% if selected_table == table.id %}selected{% endif %}>{{table.number}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <!-- Filter by Total Price -->
+                <div class="mb-3">
+                    <label for="totalPriceFilter" class="form-label">Narxi(dan):</label>
+                    <input type="number" id="totalPriceFilter" class="form-control" name="fromPrice">
+                    <label for="totalPriceFilter" class="form-label">Narxi(gacha):</label>
+                    <input type="number" id="totalPriceFilter" class="form-control" name="toPrice">
+                </div>
+                <button type="reset" class="btn btn-secondary" id="resetButton">Bekor qilish</button>
+                <button type="submit" class="btn btn-primary">Filtrlash</button>
+                </form>
+            </div>
+
+            <!-- Table of Orders -->
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Qabul qilingan vaqt</th>
+                            <th>Stol</th>
+                            <th>Jami summa</th>
+                            <th>Status</th>
+                            <th>Ma'lumot</th>
+                        </tr>
+                    </thead>
+                    
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>{{order.id}}</td>
+                            <td><i class="fas fa-calendar-week"></i> {{order.created|date:"d-m-Y"}} | <i class="fas fa-clock"></i> {{order.created|date:"H:i"}}</td>
+                            <td>{{order.table.number}}</td>
+                            <td>{{order.total_price}}</td>
+                            <td>
+                                {% if order.status == 'new' %}
+                                <span class="badge badge-primary">Yangi</span>
+                                {% elif order.status == 'in_progress' %}
+                                <span class="badge badge-warning">Tayyorlanmoqda</span>
+                                {% elif order.status == 'done' %}
+                                <span class="badge badge-success">Yetkazildi</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-primary launch" data-toggle="modal" data-target="#orderInfo{{order.id}}"> <i class="fa fa-info"></i> Ma'lumot
+                                </button>
+                            </td>
+                        </tr>
+                        {% include "kitchen/modals/order_info_modal.html" %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Pagination -->
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                {% if orders.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ orders.previous_page_number }}">Previous</a></li>
+                {% endif %}
+                {% for i in orders.paginator.page_range %}
+                <li class="page-item {% if i == orders.number %}active{% endif %}"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                {% endfor %}
+                {% if orders.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ orders.next_page_number }}">Next</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    
+</div>
+
+<style>
+    /* Custom styles for filters */
+    .filter-section {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .filter-section label {
+        font-weight: bold;
+    }
+
+    .filter-section select,
+    .filter-section input {
+        width: 100%;
+        margin-top: 5px;
+    }
+
+    /* Adjustments for table */
+    .table th,
+    .table td {
+        white-space: nowrap;
+    }
+
+    .table th:first-child,
+    .table td:first-child {
+        width: 50px; /* ID column width */
+    }
+
+    .table th:nth-child(2),
+    .table td:nth-child(2) {
+        width: 200px; /* Date column width */
+    }
+
+    /* Active pagination link style */
+    .pagination .page-item.active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+</style>
+
+<script>
+    document.getElementById('resetButton').addEventListener('click', function() {
+        // Reset the form
+        document.getElementById('filterForm').reset();
+
+        // If you want to submit the form immediately after resetting
+        document.getElementById('filterForm').submit();
+    });
+
+    document.getElementById('filterForm').addEventListener('submit', function(event) {
+        // Prevent the form from being submitted normally
+        event.preventDefault();
+
+        // Get the form data
+        var formData = new FormData(event.target);
+
+        // Create a new URLSearchParams object from the form data
+        var searchParams = new URLSearchParams(formData);
+
+        // Add the current page number to the search parameters
+        searchParams.set('page', '{{ page_obj.number }}');
+
+        // Set the URL with the search parameters
+        window.location.href = '?' + searchParams.toString();
+    });
+</script>
+
+{% endblock content %}

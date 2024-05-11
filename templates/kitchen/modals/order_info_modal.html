@@ -1,0 +1,50 @@
+
+<div class="modal fade" id="orderInfo{{order.id}}" tabindex="-1" role="dialog" aria-labelledby="orderInfoLabel{{order.id}}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body ">
+                <div class="text-right"> <i class="fa fa-close close" aria-hidden=true data-dismiss="modal"></i> </div>
+                
+                <div class="px-4 py-5">
+
+                    <h5 class="text-uppercase">buyurtma ID: {{order.id}}</h5>
+
+
+
+                <h4 class="mt-5 theme-color mb-5">Stol raqami: #{{order.table.number}}</h4>
+
+                <span class="theme-color">Vaqti: {{order.created|date:"H:i"}} | {{order.created|date:"d-m-Y"}} </span>
+                <div class="mb-3">
+                    <hr class="new1">
+                </div>
+                {% for item in order.foods.all %}
+                    <div class="d-flex justify-content-between">
+                        <span class="font-weight-bold">{{item.food.name}}</span>
+                        <small class="text-muted">{{item.price}} x {{item.quantity}} = {{item.total_price}}</small>
+                    </div>
+                {% endfor %}
+
+                
+                <div class="d-flex justify-content-between mt-3">
+                    <span class="font-weight-bold">Jami:</span>
+                    <span class="font-weight-bold theme-color">{{order.total_price}} so'm</span>
+                </div>  
+
+
+
+                <div class="text-center mt-5">
+
+
+                    {% comment %} <button class="btn btn-primary">Track your order</button> {% endcomment %}
+                    
+
+
+                </div>                   
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>

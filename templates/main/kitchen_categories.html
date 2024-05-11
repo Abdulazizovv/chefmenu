@@ -1,0 +1,150 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% block title %}
+{{ kitchen.title }} | Menu
+{% endblock title %}
+
+{% block content %}
+<style>
+    .container1 {
+        padding: 20px;
+    }
+
+    .header {
+        border-bottom: 2px solid #ccc;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding-bottom: 20px;
+    }
+
+    .header h2.text {
+        font-size: 24px;
+        color: #333;
+        margin: 0;
+    }
+
+    .categories {
+        display: flex;
+        justify-content: center;
+    }
+
+    .list-group {
+        width: 100%;
+        max-width: 500px; /* Adjust max-width as needed */
+        margin-top: 20px;
+    }
+
+    .list-group-item {
+        background-color: #fff;
+        border: none;
+        margin-bottom: 10px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+    }
+
+    .list-group-item a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .btn-floating {
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+    }
+
+    .btn-floating i {
+        font-size: 24px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 576px) {
+        .list-group-item {
+            padding: 10px; /* Adjust padding for smaller screens */
+        }
+    }
+
+    .header {
+        background-color: #f8f9fa; /* Background rangi */
+        padding: 20px; /* Padding qo'shish */
+        display: flex; /* Flexboxni ishlatish */
+        align-items: center; /* Quyilgan elementlarni vertikal ravishda markazga tushirish */
+    }
+    
+    .text {
+        color: #333; /* Matn rangi */
+    }
+    
+    .rating {
+        display: flex;
+        align-items: center;
+    }
+
+    .rating-star {
+        color: #ffc107;
+        font-size: 24px;
+        margin-right: 5px;
+    }
+
+    .rating-value {
+        font-size: 18px;
+        font-weight: bold;
+        margin-right: 10px;
+    }
+    
+    
+</style>
+
+<div class="container1 container pb-5">
+    <div class="header">
+        <img src="{{kitchen.image.url}}" style="width: 100px; height: 100px;" alt="" class="rounded-circle img-fluid">
+        <h2 class="text m-3">{{ kitchen.title }}</h2>     
+    </div>
+    <div class="card">
+        <a href="{% url "review:kitchen" kitchen.id %}" class="btn btn-primary">Sharhlar ({{comments_count}})</a>
+    </div>
+    
+    <div class="row">
+        <div class="col">
+            <div class="categories">
+                <ul class="list-group">
+                    <h2 class="text-center">
+                        Kategoriyalar
+                    </h2>
+                    {% for category in categories %}
+                    {% if category.food.all %}
+                    <li class="list-group-item">
+                        <a href="{% url "main:foods" kitchen.slug %}#{{category.slug}}" class="category-link">
+                            <div class="d-flex align-items-center justify-content">
+                                <div class="btn text-white btn-floating m-1 me-3" style="background-color: hsl(330, 70%, 50%);">
+                                    <i class="fas fa-utensils fa-2x"></i>
+                                </div>
+                                <div class="text">{{ category.title }}</div>
+                            </div>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<nav class="navbar fixed-bottom bottom-navbar navbar-expand-lg navbar-light bg-light pt-0">
+    <div class="container-fluid">
+        <a class="nav-link" href="{% url "main:menu" kitchen.slug %}"><i class="fas fa-home navbar-icon"></i><span class="d-none d-lg-inline">Kategoriyalar</span></a>
+        <a class="nav-link" href="{% url "main:foods" kitchen.slug %}"><i class="fas fa-utensils navbar-icon"></i><span class="d-none d-lg-inline"> Taomlar</span></a>
+        <a class="nav-link" href="{% url 'cart:cart' kitchen.id %}"><i class="fas fa-shopping-cart navbar-icon"></i><span class="d-none d-lg-inline"> Savatcha</span></a>
+        <a class="nav-link" href="{% url "main:kitchen_info" kitchen.slug %}"><i class="fas fa-info-circle navbar-icon"></i></i></i><span class="d-none d-lg-inline">Ma'lumot</span></a>
+        <a class="nav-link" href="{% url "review:kitchen" kitchen.id %}"><i class="fas fa-comments navbar-icon"></i></i><span class="d-none d-lg-inline"> Sharhlar</span></a>
+    </div>
+</nav>
+
+{% endblock content %}

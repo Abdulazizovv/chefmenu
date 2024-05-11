@@ -1,0 +1,213 @@
+{% extends "kitchen/base.html" %}
+{% block title %}Food Detail: {{ food.name }}{% endblock title %}
+{% block content %}
+
+<style>
+    .modal1 {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+</style>
+
+
+
+
+<div class="container">
+    <!-- Back button -->
+    <div class="mt-3">
+        <a href="{% url "menu:category_foods" food.category.slug %}" class="btn btn-secondary"><i class="fa fa-arrow-left" aria-hidden="true"></i>Orqaga</a>
+        <a href="{% url "menu:kitchen_menu"%}" class="btn btn-primary"></i>Barcha kategoriyalar</a>
+    </div>
+    
+    <h2 class="mt-4 text">Taom ma'lumotlarini ko'rish va tahrirlash</h2>
+    <!-- Food details display -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <img src="{{ food.image.url }}" class="card-img-top" alt="{{ food.name }}" style="height: 300px; object-fit: cover;" data-bs-toggle="modal" data-bs-target="#foodImageModal">
+                <div class="card-body">
+                    <h5 class="card-title">{{ food.name }}</h5>
+                    <p class="card-text">Tavsif: {{ food.description }}</p>
+                    <p class="card-text"><strong>Narxi:</strong> {{ food.price }} so'm</p>
+                </div>
+            </div>
+        </div> 
+        <div class="col-md-6">
+            <!-- Food edit form -->
+            <form method="post" action="{% url "menu:edit_food_details" %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="foodName" class="form-label">Taom nomi:</label>
+                    <input type="text" class="form-control" id="foodName" name="foodName" value="{{ food.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="category" class="form-label">Kategoriya:</label>
+                    <select class="form-control" id="category" name="foodCategory" required>
+                        <option value="{{food.category.id}}" selected>{{food.category.title}}</option>
+                        {% for category in categories %}
+                        {% if category.id != food.category.id %}
+                        <option value="{{ category.id }}">{{ category.title }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="foodDescription" class="form-label">Taom tavsifi:</label>
+                    <textarea class="form-control" id="foodDescription" name="foodDescription" rows="3" required>{{ food.description }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="foodPrice" class="form-label">Narxi(so'm):</label>
+                    <input type="number" class="form-control" id="foodPrice" name="foodPrice" step="0.01" value="{{ food.price }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="foodImage" class="form-label">Food Image:</label>
+                    <input type="file" class="form-control" id="foodImage" name="foodImage" accept="image/*">
+                </div>
+                <input type="hidden" name="foodId" value="{{food.id}}">
+                <button type="submit" class="btn btn-primary"><i class="far fa-save"></i> Saqlash</button>
+            </form>
+            <!-- Add food variant button -->
+            {% comment %} <button type="button" class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#addVariantModal"><i class="fas fa-plus"></i>Taom turi qo'shish</button> {% endcomment %}
+        </div>
+    </div>
+
+    <!-- Food variants display -->
+    {% if food.variants.all %}
+    <div class="row mt-4">
+        <div class="col">
+            <h4>Taom turlari</h4>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% for variant in food.variants.all %}
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="{{ variant.image.url }}" class="card-img-top" style="height: 300px; object-fit: cover;" alt="{{ variant.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ variant.name }}</h5>
+                            <p class="card-text">Tavsif: {{ variant.description }}</p>
+                            <p class="card-text"><strong>Narxi:</strong> {{ variant.price }} so'm</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editVariantModal{{variant.id}}"><i class="fas fa-edit"></i>O'zgartirish</button>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteVariantModal{{variant.id}}"><i class="fas fa-trash-alt"></i>O'chirish</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Edit food variant modal -->
+                <div class="modal fade modal1" id="editVariantModal{{variant.id}}" tabindex="-1" aria-labelledby="editVariantModalLabel{{variant.id}}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editVariantModalLabel{{variant.id}}">Taom turini tahrirlash</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- Form for editing food variant -->
+                                <form method="post" action="" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label for="variantName{{variant.id}}" class="form-label">Tur nomi:</label>
+                                        <input type="text" class="form-control" id="variantName{{variant.id}}" name="variantName" value="{{ variant.name }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="variantDescription{{variant.id}}" class="form-label">Tur tavsifi:</label>
+                                        <textarea class="form-control" id="variantDescription{{variant.id}}" name="variantDescription" rows="3">{{ variant.description }}</textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="variantPrice{{variant.id}}" class="form-label">Narxi:</label>
+                                        <input type="number" class="form-control" id="variantPrice{{variant.id}}" name="variantPrice" step="500" value="{{ variant.price }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="variantImage{{variant.id}}" class="form-label">Surat:</label>
+                                        <input type="file" class="form-control" id="variantImage{{variant.id}}" name="variantImage" accept="image/*">
+                                    </div>
+                                    <input type="hidden" name="foodId" value="{{food.id}}">
+                                    <button type="submit" class="btn btn-primary mb-3">O'zgarishlarni saqlash</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delete food variant modal -->
+                <div class="modal fade modal1" id="deleteVariantModal{{variant.id}}" tabindex="-1" aria-labelledby="deleteVariantModalLabel{{variant.id}}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteVariantModalLabel{{variant.id}}">{{variant.name}}ni o'chirish</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="text-danger p-3">Rostdan ham o'chirmoqchimisiz?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">bekor qilish</button>
+                                <a href="{% url "menu:delete_food_variant" variant.id %}" class="btn btn-danger">O'chirish</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Food image modal -->
+<div class="modal fade" id="foodImageModal" tabindex="-1" aria-labelledby="foodImageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <img src="{{ food.image.url }}" class="img-fluid" alt="{{ food.name }}">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add food variant modal -->
+<div class="modal fade" id="addVariantModal" tabindex="-1" aria-labelledby="addVariantModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addVariantModalLabel">Add Food Variant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form for adding food variant -->
+                <form method="post" action="{% url "menu:add_food_variant" %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="food_id" value="{{ food.id }}">
+                    <div class="mb-3">
+                        <label for="variantName" class="form-label">Variant Name:</label>
+                        <input type="text" class="form-control" id="variantName" name="variantName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="variantDescription" class="form-label">Variant Description:</label>
+                        <textarea class="form-control" id="variantDescription" name="variantDescription" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="variantPrice" class="form-label">Variant Price:</label>
+                        <input type="number" class="form-control" id="variantPrice" name="variantPrice" step="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="variantImage" class="form-label">Variant Image:</label>
+                        <input type="file" class="form-control" id="variantImage" name="variantImage" accept="image/*">
+                    </div>
+                    <input type="hidden" name="foodId" value="{{food.id}}">
+                    <button type="submit" class="btn btn-primary m-3">Add Variant</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+{% endblock content %}

@@ -1,0 +1,62 @@
+<!-- Edit Food Modal -->
+<div class="modal fade" id="editFoodModal" tabindex="-1" aria-labelledby="editFoodModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editFoodModalLabel">Edit Food</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editFoodForm" method="post" action="" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="editFoodName" class="form-label">Food Name:</label>
+                        <input type="text" class="form-control" id="editFoodName" name="editFoodName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editFoodDescription" class="form-label">Food Description:</label>
+                        <textarea class="form-control" id="editFoodDescription" name="editFoodDescription" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editFoodPrice" class="form-label">Food Price:</label>
+                        <input type="number" class="form-control" id="editFoodPrice" name="editFoodPrice" step="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editFoodImage" class="form-label">Current Food Image:</label>
+                        <img src="{{ food.image.url }}" class="img-thumbnail" alt="{{ food.name }}" id="currentFoodImage" style="max-width: 200px;">
+                        <input type="file" class="form-control mt-2" id="editFoodImage" name="editFoodImage" accept="image/*">
+                    </div>
+                    <input type="hidden" id="editFoodId" name="editFoodId">
+                </form>
+                <div id="variantSection">
+                    <hr>
+                    <h5>Food Variants:</h5>
+                    <ul id="variantList" class="list-group mb-3">
+                        {% for variant in food.variants.all %}
+                        <li class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <strong>{{ variant.name }}</strong> - Price: ${{ variant.price }}
+                                </div>
+                                <div class="col-auto">
+                                    <button type="button" class="btn btn-sm btn-primary edit-variant-btn" data-variant-id="{{ variant.id }}" data-variant-name="{{ variant.name }}" data-variant-price="{{ variant.price }}">
+                                        Edit
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger delete-variant-btn" data-variant-id="{{ variant.id }}">
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <button type="button" class="btn btn-sm btn-success" id="addVariantBtn">Add Variant</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="updateFoodBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>

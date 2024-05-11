@@ -1,0 +1,24 @@
+<!-- Delete Category Modal -->
+<div class="modal fade" id="deleteCategoryModal{{category.id}}" tabindex="-1" role="dialog" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteCategoryModalLabel">{{category.title}} kategoriyasini o'chirish</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{% url "menu:delete_category" %}" method="POST"> {% csrf_token %}
+                <input type="hidden" name="category_id" value="{{category.id}}">
+            
+            <div class="modal-body">
+                <p><span class="text-danger">Kategoriyani o'chirsangiz undagi barcha taomlar ham o'chiriladi.</span> Rostdan ham kategoriyani o'chirmoqchimisiz?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>

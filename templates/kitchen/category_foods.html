@@ -1,0 +1,129 @@
+{% extends "kitchen/base.html" %}
+
+{% block title %}
+Kitchen Menu
+{% endblock title %}
+
+{% block content %}
+
+<style>
+    .card-img-top {
+        height: 200px; /* Set a fixed height for the card images */
+        object-fit: cover; /* Ensure the images cover the entire space */
+    }
+
+    .variant-image {
+        width: 100px; /* Set a fixed width */
+        height: 100px; /* Set a fixed height */
+        object-fit: cover; /* Maintain aspect ratio and cover container */
+    }
+</style>
+
+<div class="container">
+    <div class="row mt-4">
+        <div class="col mb-3">
+            <a href="{% url 'menu:kitchen_menu' %}" class="btn btn-secondary"><i class="fa fa-arrow-left" aria-hidden="true"></i>Orqaga</a>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFoodModal1">
+                <i class="fas fa-plus"></i> Taom qo'shish
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <h3 class="text-center text-black">{{ category.title }}{% if category.food.count %}({{category.food.count}} ta taom){% else %} (taomlar mavjud emas){% endif %}</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for food in foods %}
+
+        <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+            <div class="card shadow">
+                <img src="{{ food.image.url }}" class="card-img-top" alt="{{ food.name }}" data-toggle="modal" data-target="#foodModal{{ food.id }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ food.name }}</h5>
+                    <p class="card-text">Tavsif: {{ food.description }}</p>
+                    <p class="card-text"><strong>Narxi: {{ food.price }} so'm</strong></p>
+                    {% if food.has_variants %}
+                    <button type="button" class="btn btn-info btn-sm" data-toggle="collapse" data-target="#foodVariants{{ food.id }}" aria-expanded="false" aria-controls="foodVariants{{ food.id }}">
+                        View Variants {{food.variants.count}}
+                    </button>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-white">
+                    <a href="{% url "menu:edit_food" food.id%}">
+                            <button type="button" class="btn btn-primary btn-sm edit-food-btn">
+                            <i class="fa fa-cog" aria-hidden="true"></i>Tahrirlash
+                        </button>
+                        </a>
+                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteFoodModal{{ food.id }}"><i class="fa fa-trash" aria-hidden="true"></i>O'chirish</button>
+                </div>
+                
+                {% comment %} Delete modal {% endcomment %}
+                <div class="modal fade" id="deleteFoodModal{{food.id}}" tabindex="-1" role="dialog" aria-labelledby="deleteFoodModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <form action="{% url "menu:delete_food" %}" method="POST"> {% csrf_token %}
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteFoodModalLabel">{{food.name}}ni menyudan o'chirish</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <input type="hidden" name="categorySlug" value="{{food.category.slug}}">
+                            <input type="hidden" name="foodId" value="{{food.id}}">
+                            
+                            <div class="modal-body">
+                                <p><span class="text-danger">
+                                    {{food.name}}</span>ni o'chirishni xoxlaysizmi?
+                                </p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Bekor qilish</button>
+                                <button type="submit" class="btn btn-danger">O'chirish</button>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Food Image Modal -->
+                <div class="modal fade" id="foodModal{{ food.id }}" tabindex="-1" aria-labelledby="foodModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-body">
+                                <img src="{{ food.image.url }}" class="img-fluid" alt="{{ food.name }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Food Variants -->
+                <div class="collapse" id="foodVariants{{ food.id }}">
+                    <div class="card card-body">
+                        <h6>Variants:</h6>
+                        <ul class="list-group">
+                            {% for variant in food.variants.all %}
+                            <li class="list-group-item">
+                                <div class="row">
+                                    <div class="col-auto">
+                                        <img src="{{ variant.image.url }}" class="img-thumbnail variant-image" alt="{{ variant.name }}" style="max-width: 100px;">
+                                    </div>
+                                    <div class="col-auto">{{ variant.name }} <br> Narxi: {{ variant.price }} so'm</div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% include "kitchen/modals/add_foodvariant_modal.html" %}
+
+
+
+{% endblock content %}

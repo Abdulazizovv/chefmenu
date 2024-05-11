@@ -1,0 +1,23 @@
+<!-- Edit Category Modal -->
+<div class="modal fade" id="editCategoryModal{{category.id}}" tabindex="-1" role="dialog" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCategoryModalLabel">Kategoriya</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url "menu:edit_category" %}"> {% csrf_token %}
+                    <div class="form-group">
+                        <label for="editCategoryName">Kategoriya nomi</label>
+                        <input type="text" class="form-control" id="editCategoryName" name="category_name" placeholder="Kategoriya nomini kiriting" value="{{category.title}}" required>
+                    </div>
+                    <input type="hidden" name="category_id" value="{{category.id}}">
+                    <button type="submit" class="btn btn-primary mb-3">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

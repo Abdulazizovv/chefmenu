@@ -1,0 +1,144 @@
+{% extends "kitchen/base.html" %}
+{% load static %}
+
+{% block title %}
+Add Food
+{% endblock title %}
+
+{% block content %}
+<style>
+    .card {
+        transition: transform 0.3s;
+        height: 390px; /* Adjust card height */
+        border-radius: 15px;
+    }
+
+    .card:hover {
+        transform: scale(1.05);
+    }
+
+    .card-body {
+        height: 100%;
+    }
+
+    .card-img-top {
+        height: 200px;
+        object-fit: cover;
+        border-radius: 15px 15px 0 0; /* Rounded corners for top */
+    }
+
+    .variant-image {
+        max-width: 80px;
+    }
+
+    .add-variant-form {
+        display: none; /* Hide add variant form by default */
+    }
+</style>
+
+<div class="container">
+    <h2 class="text-center text-primary mb-4">
+        Yangi taom qo'shish
+    </h2>
+    <div class="row">
+        <!-- Left Side: Food Card -->
+        <div class="col-lg-4">
+            <h2>Taxminiy ko'rinish</h2>
+            <div class="card shadow mb-4">
+                <img id="foodImagePreview" src="{% static "img/custom/default-food-image.jpg" %}" class="card-img-top" alt="Food Image">
+                <div class="card-body">
+                    <h5 id="foodTitle">Taom nomi</h5>
+                    <p id="foodCategory" class="card-text"><strong>Kategoriya: {{categories|first}}</strong></p>
+                    <p id="foodDescription" class="card-text">Tavsif: </p>
+                    <p id="foodPrice" class="card-text"><strong>Narxi: so'm</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Food Form -->
+        <div class="col-lg-8">
+            <form id="addFoodForm" method="post" action="{% url 'menu:add_food' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="foodName" class="form-label">Nomi:</label>
+                    <input type="text" class="form-control" id="foodName" name="foodName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="category" class="form-label">Kategoriya:</label>
+                    <select class="form-control" id="category" name="foodCategory" required>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="foodDescriptionInput" class="form-label">Tafsilot:</label>
+                    <textarea class="form-control" id="foodDescriptionInput" name="foodDescription" rows="3"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="foodPrice" class="form-label">Narxi:</label>
+                    <input type="number" class="form-control" id="foodPriceInput" name="foodPrice" step="100" value="0" required>
+                </div>
+                <div class="mb-3">
+                    <label for="foodImageInput" class="form-label">Surat:</label>
+                    <input type="file" class="form-control" id="foodImageInput" name="foodImage" accept="image/*" required onchange="previewFoodImage(this)">
+                </div>
+                <input type="hidden" name="redirectUrl" id="" value="menu:edit_food">
+                <button type="submit" class="btn btn-primary">Qo'shish</button>
+            </form>
+
+            <!-- Add Food Variant Form -->
+            {% comment %} <div class="mt-4 add-variant-form">
+                <h5>Add Food Variant</h5>
+                <form id="addVariantForm" method="post" action="{% url 'menu:add_food_variant' %}">
+                    {% csrf_token %}
+                    <!-- Add fields for food variant here -->
+                    <button type="submit" class="btn btn-primary">Add Food Variant</button>
+                </form>
+            </div> {% endcomment %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // Update card with form input data
+    document.getElementById('addFoodForm').addEventListener('input', function() {
+        document.getElementById('foodTitle').textContent = document.getElementById('foodName').value;
+        document.getElementById('foodCategory').textContent = 'Kategoriya: ' + document.getElementById('category').options[document.getElementById('category').selectedIndex].text;
+        document.getElementById('foodDescription').textContent = 'Tavsif: ' + document.getElementById('foodDescriptionInput').value;
+        document.getElementById('foodPrice').innerHTML = '<strong>Narxi: ' + document.getElementById('foodPriceInput').value + ' so`m</strong>';
+    });
+
+    // Preview uploaded food image
+    function previewFoodImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('foodImagePreview').src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    
+    //<!-- Form validation -->
+    document.getElementById('addFoodForm').addEventListener('submit', function(event) {
+        var imageInput = document.getElementById('foodImageInput');
+        var priceInput = document.getElementById('foodPriceInput');
+        
+        if (!imageInput.files[0] || !priceInput.checkValidity()) {
+            event.preventDefault(); // Prevent form submission if image or price is invalid
+            alert('Please upload a valid image and enter a valid price.');
+        }
+    });
+
+    // Alert if user tries to leave page without submitting form
+    {% comment %} window.addEventListener('beforeunload', function(e) {
+        if (document.getElementById('addFoodForm').querySelector('[name="foodName"]').value !== '' || document.getElementById('addFoodForm').querySelector('[name="foodDescription"]').value !== '') {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    }); {% endcomment %}
+
+</script>
+
+{% endblock content %}

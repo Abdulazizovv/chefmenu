@@ -1,0 +1,78 @@
+{% extends "main/base.html" %}
+
+
+{% block title %}
+
+
+{{kitchen.title}}
+
+
+{% endblock title %}
+
+
+{% block content %}
+
+<style>
+
+.testimonial-card .card-up {
+    height: 120px;
+    overflow: hidden;
+    border-top-left-radius: .25rem;
+    border-top-right-radius: .25rem;
+  }
+  
+  .aqua-gradient {
+    background: linear-gradient(40deg, #2096ff, #05ffa3) !important;
+  }
+  
+  .testimonial-card .avatar {
+    width: 120px;
+    margin-top: -60px;
+    overflow: hidden;
+    border: 5px solid #fff;
+    border-radius: 50%;
+  }
+</style>
+
+
+<div class="container">
+    <section class="mx-auto my-5" style="max-width: 23rem;">
+        
+      <div class="card testimonial-card mt-2 mb-3">
+        <div class="card-up aqua-gradient"></div>
+        <div class="avatar mx-auto white">
+          <img src="{{kitchen.image.url}}" class="rounded-circle img-fluid"
+            alt="woman avatar">
+        </div>
+        <div class="card-body text-center">
+          <h4 class="card-title font-weight-bold">{{kitchen.title}}</h4>
+          <hr>
+          <p>
+            {{kitchen.info}} 
+          </p>
+          <p>
+            <i class="fas fa-map-marker-alt"></i> Manzil: {{kitchen.address}}
+          </p>
+          <p>
+            <i class="fas fa-phone-square-alt"></i> Telefon raqam: <br>{% for number in kitchen.phone_numbers.all %}
+                {{number.number}} <br>
+            {% endfor %}
+          </p>
+        </div>
+      </div>
+      
+    </section>
+  </div>
+
+<nav class="navbar fixed-bottom bottom-navbar navbar-expand-lg navbar-light bg-light pt-0">
+    <div class="container-fluid">
+        <a class="nav-link" href="{% url "main:menu" kitchen.slug %}"><i class="fas fa-home navbar-icon"></i><span class="d-none d-lg-inline">Kategoriyalar</span></a>
+        <a class="nav-link" href="{% url "main:foods" kitchen.slug %}"><i class="fas fa-utensils navbar-icon"></i><span class="d-none d-lg-inline"> Taomlar</span></a>
+        <a class="nav-link" href="{% url 'cart:cart' kitchen.id %}"><i class="fas fa-shopping-cart navbar-icon"></i><span class="d-none d-lg-inline"> Savatcha</span></a>
+        <a class="nav-link" href="{% url "main:kitchen_info" kitchen.slug %}"><i class="fas fa-info-circle navbar-icon"></i></i></i><span class="d-none d-lg-inline">Ma'lumot</span></a>
+        <a class="nav-link" href="{% url "review:kitchen" kitchen.id %}"><i class="fas fa-comments navbar-icon"></i></i><span class="d-none d-lg-inline"> Sharhlar</span></a>
+    </div>
+</nav>
+
+
+{% endblock content %}

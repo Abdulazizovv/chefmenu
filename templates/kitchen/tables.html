@@ -1,0 +1,197 @@
+{% extends "kitchen/base.html" %}
+{% block title %}Create Table{% endblock %}
+
+{% block content %}
+
+<style>
+    .table-container {
+        padding: 20px;
+    }
+    .table-responsive {
+        border-radius: 15px;
+        overflow: auto;
+    }
+    /* Additional styling for responsiveness */
+    @media (max-width: 768px) {
+        .modal-dialog {
+            margin: 0 auto;
+            max-width: 90%;
+        }
+    }
+</style>
+
+<div class="container">
+    {% if tables %}
+    <h1 class="text-center mt-5 mb-4">Stollar</h1>
+    <!-- Button to trigger modal -->
+    <div class="d-flex justify-content-between mb-3">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTableModal">
+            Qo'shish <i class="fas fa-plus"></i>
+        </button>
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTableModal">
+            O'chirish <i class="fas fa-minus"></i>
+        </button>
+    </div>
+
+    <!-- Add Table Modal -->
+    {% include 'kitchen/modals/add_table_modal.html' %}
+
+    <!-- Delete Table Modal -->
+    {% include 'kitchen/modals/delete_table_modal.html' %}
+
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Stol raqami</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Harakat</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for table in tables %}
+                    <tr>
+                        <td>{{table.number}}</td>
+                        <td>
+                            {% if table.status == 'available' %}
+                            <span class="badge bg-success">Bo'sh</span>
+                            {% elif table.status == 'reserved' %}
+                            <span class="badge bg-warning text-dark">Zaxira</span>
+                            {% elif table.status == 'occupied' %}
+                            <span class="badge bg-danger">Band</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editTableModal{{table.id}}"><i class="fas fa-edit"></i></button>
+                            
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#qrCodeModal{{ table.id }}">
+                                <i class="fas fa-qrcode"></i> QR Code
+                            </button>
+                        </td>
+                    </tr>
+                    <!-- Edit Table Modal -->
+                    {% include 'kitchen/modals/edit_table_modal.html' %}
+
+                    <!-- QR Code Modal -->
+                    <div class="modal fade" id="qrCodeModal{{ table.id }}" tabindex="-1" aria-labelledby="qrCodeModalLabel{{ table.id }}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="qrCodeModalLabel{{ table.id }}">{{table.number}}-stol QR Code</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="text-center">
+                                        <img src="{{table.qr_code.url}}" alt="QR Code" class="img-fluid" id="qrCodeImage{{ table.id }}">
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" onclick="printQRCode('qrCodeImage{{ table.id }}', {{table.number}})">Chop etish <i class="fas fa-print"></i></button>
+                                    <button type="button" class="btn btn-success" onclick="downloadQRCode('qrCodeImage{{ table.id }}')">Yuklab olish <i class="fas fa-download"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="mt-5 mb-4">Stollar qo'shish</h2>
+            <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <div class="mb-3">
+                    <p>*Eslatma: Bir urinishda maksimal 10 ta stol qo'shish mumkin!</p>
+                    <label for="table_number" class="form-label">Stollar sonini kiriting</label>
+                    <input type="number" class="form-control" id="table_number" name="table_number" min="1" required>
+                    <div class="invalid-feedback">
+                        Noto'g'ri son kiritildi!
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Qo'shish</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+
+<div class="row">
+    <div class="demo">
+        <nav class="pagination-outer" aria-label="Page navigation">
+            <ul class="pagination">
+                <li class="page-item {% if not tables.has_previous %} disabled{% endif %}">
+                    <a href="{% if tables.has_previous %}?page={{tables.previous_page_number}}{% endif %}" class="page-link" aria-label="Previous">
+                        <span aria-hidden="true">«</span>
+                    </a>
+                </li>
+                {% for page_num in tables.paginator.page_range %}
+                
+                {% if page_num >= tables.number|add:'-3' and page_num <= tables.number|add:'3' %}
+                        <li class="page-item {% if page_num == tables.number %}active{% endif %}"><a class="page-link " href="?page={{page_num}}">{{page_num}}</a></li>
+                {% endif %}
+                {% endfor %}
+                <li class="page-item {% if not tables.has_next %} disabled{% endif %}">
+                    <a href="{% if tables.has_next %}?page={{ tables.next_page_number }}{% endif %}" class="page-link" aria-label="Next">
+                        <span aria-hidden="true">»</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+
+<!-- JavaScript for form validation -->
+<script>
+    (function () {
+        'use strict';
+
+        var forms = document.querySelectorAll('.needs-validation');
+
+        Array.from(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+
+    function printQRCode(imageId, tableNumber) {
+        var img = document.getElementById(imageId);
+        var newWindow = window.open('', '_blank');
+        newWindow.document.write('<html><head><title>{{request.user.kitchen.title}}' + tableNumber + '-stol</title>');
+        newWindow.document.write('<style>img { display: block; margin: 0 auto; }</style></head><body>');
+        newWindow.document.write('<img src="' + img.src + '" />');
+        newWindow.document.write('</body></html>');
+        newWindow.document.close();
+        newWindow.print();
+    }
+
+
+    function downloadQRCode(imageId) {
+        var img = document.getElementById(imageId);
+        var url = img.src;
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'qr_code.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+</script>
+
+{% endblock %}

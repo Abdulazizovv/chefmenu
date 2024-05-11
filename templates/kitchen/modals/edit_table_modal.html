@@ -1,0 +1,29 @@
+<!-- Modal for editing a table -->
+<div class="modal fade" id="editTableModal{{table.id}}" tabindex="-1" aria-labelledby="editTableModalLabel{{table.id}}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTableModalLabel{{table.id}}">{{table.number}} - stolni tahrirlash</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" class="needs-validation" novalidate action="{% url "table:edit" %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="table_status">Stol statusi</label>
+                        <select class="form-select" id="table_status" name="table-status" required>
+                            <option value="available" {% if table.status == 'available' %}selected{% endif %}>Bo'sh</option>
+                            <option value="reserved" {% if table.status == 'reserved' %}selected{% endif %}>Zaxira</option>
+                            <option value="occupied" {% if table.status == 'occupied' %}selected{% endif %}>Band</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select a valid table status.
+                        </div>
+                        <input type="hidden" name="table-id" value="{{table.id}}">
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-3">Tasdiqlash</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,25 @@
+<!-- Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addCategoryModalLabel">Yangi kategoriya qo'shish</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{% url "menu:kitchen_menu" %}"> {% csrf_token %}
+          <div class="form-group">
+            <label for="categoryName">Kategoriya nomi</label>
+            <input type="text" class="form-control" id="categoryName" name="category_name" placeholder="Kategoriya nomini kiriting">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Bekor qilish</button>
+            <button type="submit" class="btn btn-primary">Saqlash</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

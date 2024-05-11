@@ -1,0 +1,254 @@
+{% extends "kitchen/base.html" %}
+{% load static %}
+
+{% block title %}
+    Kitchen Profile
+{% endblock %}
+
+{% block content %}
+<style>
+
+    .container {
+        margin-top: 50px;
+    }
+
+    /* Card styles */
+    .card {
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border: none;
+        border-radius: 10px;
+    }
+
+    .card-title {
+        color: #333;
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+    }
+
+    .card-text {
+        color: #666;
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+
+    /* Button styles */
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        border-radius: 5px;
+        padding: 8px 20px;
+        font-size: 1rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+
+    .btn-outline-primary {
+        color: #007bff;
+        border-color: #007bff;
+        border-radius: 5px;
+        padding: 8px 20px;
+        font-size: 1rem;
+    }
+
+    .btn-outline-primary:hover {
+        color: #0056b3;
+        border-color: #0056b3;
+    }
+
+    /* Modal styles */
+    .modal-content {
+        background-color: #fff;
+        border-radius: 10px;
+    }
+
+    .modal-header {
+        border-bottom: none;
+    }
+
+    .modal-title {
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+
+    .modal-footer {
+        border-top: none;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="text-center">
+                        <img src="{% if kitchen.image %}{{ kitchen.image.url }}{% else %}{% static 'img/default_kitchen_image.png' %}{% endif %}" alt="Kitchen Logo" class="img-fluid rounded-circle mb-3">
+                        <h5 class="card-title">{{ kitchen.title }}</h5>
+                        <p class="card-text">{{ kitchen.info }}</p>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal"><i class="far fa-edit"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Oshxona ma'lumotlari</h5>
+                    <p class="card-text">Telefon raqamlar:
+                        {% for phone_number in phone_numbers %}
+                            <p>{{phone_number.number}}</p>
+                        {% endfor %}
+                    </p>
+                    <p class="card-text">Address: {{ kitchen.address }}</p>
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editContactModal"><i class="far fa-edit"></i></button>
+                </div>
+            </div>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Ijtimoiy tarmoqlar</h5>
+                    <p class="card-text">Telegram: {% if kitchen.telegram %}<a href="https://{{ kitchen.telegram }}" target="_blank">{{ kitchen.telegram }}</a>{% endif %}</p>
+                    <p class="card-text">Facebook: {% if kitchen.facebook %}<a href="https://{{ kitchen.facebook }}">{{ kitchen.facebook }}</a>{% endif %}</p>
+                    <p class="card-text">Twitter: {% if kitchen.twitter %}<a href="https://{{ kitchen.twitter }}">{{ kitchen.twitter }}</a>{% endif %}</p>
+                    <p class="card-text">Instagram: {% if kitchen.instagram %}<a href="https://{{ kitchen.instagram }}">{{ kitchen.instagram }}</a>{% endif %}</p>
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editSocialModal"><i class="far fa-edit"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Oshxona ma'lumotlarini tahrirlash</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="kitchenName" class="form-label">Oshxona nomi</label>
+              <input type="text" class="form-control" id="kitchenName" name="kitchenName" value="{{ kitchen.title }}">
+            </div>
+            <div class="mb-3">
+                <label for="kitchenInfo" class="form-label">Oshxona haqida</label>
+                <textarea class="form-control" id="kitchenInfo" name="kitchenInfo" rows="3">{{ kitchen.info }}</textarea>
+            </div>
+            <div class="mb-3">
+              <label for="kitchenImage" class="form-label">Oshxona Rasmi</label>
+              <input type="file" class="form-control" id="kitchenImage" name="kitchenImage" onchange="displayImage(this)">
+              <img id="selectedImage" src="#" alt="Selected Image" style="display: none; max-width: 100%; height: auto;">
+            </div>
+            <input type="hidden" name="section" value="profile">
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+              <button type="submit" class="btn btn-primary">Saqlash</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- Edit Contact Modal -->
+<div class="modal fade" id="editContactModal" tabindex="-1" aria-labelledby="editContactModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Oshxona ma'lumotlarini tahrirlash</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="POST">
+        <div class="modal-body">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="kitchenAddress" class="form-label">
+                    Manzil
+                </label>
+                <input type="text" class="form-control" id="kitchenAddress" name="kitchenAddress" value="{{ kitchen.address }}">
+            </div>
+            {% if phone_numbers %}
+            {% for phone_number in phone_numbers %}
+            <div class="mb-3">
+                <label for="kitchenPhone" class="form-label">Telefon raqam</label>
+                <input type="text" class="form-control" id="kitchenPhoneNumber{{forloop.counter}}" name="kitchenPhoneNumber[]" value="{{phone_number.number}}">
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="mb-3">
+                <label for="kitchenPhone" class="form-label">Telefon raqami</label>
+                <input type="text" class="form-control" id="kitchenPhoneNumber{{forloop.counter}}" name="kitchenPhoneNumber[]">
+            </div>
+            {% endif %}
+            <input type="hidden" name="section" value="contact">
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+    </form>
+      </div>
+    </div>
+</div>
+
+<!-- Edit Social Modal -->
+<div class="modal fade" id="editSocialModal" tabindex="-1" aria-labelledby="editSocialModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Oshxonaning ijtimoiy tarmoqlardagi sahifalari</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="POST">
+        <div class="modal-body">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="kitchenInstagram" class="form-label">Telegram</label>
+                <input type="text" class="form-control" id="kitchenTelegram" name="kitchenTelegram" value="{% if kitchen.telegram %}{{ kitchen.telegram }}{% endif %}" placeholder="namuna: t.me/mykitchen">
+            </div>
+            <div class="mb-3">
+              <label for="kitchenInstagram" class="form-label">Instagram</label>
+              <input type="text" class="form-control" id="kitchenInstagram" name="kitchenInstagram" value="{% if kitchen.instagram %}{{ kitchen.instagram }}{% endif %}" placeholder="namuna: instagram.com/username">
+            </div>
+            <div class="mb-3">
+              <label for="kitchenFacebook" class="form-label">Facebook</label>
+              <input type="text" class="form-control" id="kitchenFacebook" name="kitchenFacebook" value="{% if kitchen.facebook %}{{ kitchen.facebook }}{% endif %}" placeholder="namuna: facebook.com/username">
+            </div>
+            <div class="mb-3">
+              <label for="kitchenTwitter" class="form-label">Twitter</label>
+              <input type="text" class="form-control" id="kitchenTwitter" name="kitchenTwitter" value="{% if kitchen.twitter %}{{ kitchen.twitter }}{% endif %}" placeholder="namuna: twitter.com/username">
+            </div>
+            <p>*Diqqat: Oshxonaning ijtimoiy tarmoqdagi sahifalarini kiritishda e'tiborli bo'ling. Noto'g'ri kiritilgan linklarga biz javobgar emasmiz!</p>
+            <input type="hidden" name="section" value="social">
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">chiqish</button>
+            <button type="submit" class="btn btn-primary">Saqlash</button>
+        </div>
+    </form>
+      </div>
+    </div>
+</div>
+
+<script>
+    function displayImage(input) {
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          $('#selectedImage').attr('src', e.target.result);
+          $('#selectedImage').show();
+        }
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,314 @@
+{% extends "main/base.html" %}
+
+{% block title %}
+Savatcha
+{% endblock title %}
+
+{% block content %}
+
+<style>
+  .container1 {
+    margin-top: 2em;
+    margin-bottom: 25px;
+  }
+
+  .card {
+    max-width: 30em;
+    flex-direction: row;
+    background-color: #ffffff;
+    border: 0;
+    box-shadow: 0 7px 7px rgba(0, 0, 0, 0.18);
+    margin: 3em auto;
+  }
+
+  .card.dark {
+    color: #fff;
+  }
+
+  .card.card.bg-light-subtle .card-title {
+    color: rgb(241, 239, 239);
+  }
+  
+  .card img {
+    max-width: 25%;
+    margin: auto;
+    padding: 0.5em;
+    border-radius: 0.7em;
+  }
+
+  .card-body {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .text-section {
+    max-width: 60%;
+  }
+
+  .cta-section {
+    max-width: 40%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .cta-section .btn {
+    padding: 0.3em 0.5em;
+  }
+
+  .card.bg-light-subtle .cta-section .btn {
+    background-color: #ffffff;
+    border-color: #898989;
+  }
+
+  .summary-section {
+    position: sticky;
+    top: 0;
+    background-color: #f5f1f1;
+    padding: 0.5em;
+    border-radius: 10px;
+    box-shadow: 0 7px 7px rgba(0, 0, 0, 0.18);
+    z-index: 999;
+  }
+
+  .summary-section h5 {
+    color: #333;
+  }
+
+  .summary-section .btn-primary {
+    background-color: #8a2be2;
+    border-color: #8a2be2;
+  }
+
+  @media screen and (max-width: 475px) {
+    .card {
+      font-size: 0.9em;
+    }
+  }
+
+  .summary-section {
+    background-color: #f8f9fa;
+    padding: 0px; /* Reduced padding */
+    {% comment %} border-radius: 10px; {% endcomment %}
+    {% comment %} box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); {% endcomment %}
+    margin-bottom: 10px; /* Add margin bottom to create space between summary and cards */
+}
+
+.summary-section h5 {
+    color: #333;
+    margin-bottom: 5px; /* Reduced margin */
+}
+
+.summary-section .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    margin-top: 10px; /* Add margin top to create space between button and text */
+}
+
+.sticky-bottom {
+  position: sticky;
+  bottom: 0;
+  z-index: 999;
+  margin-bottom: 25px;
+  border-radius: 10px;
+  box-shadow: 0 7px 7px rgba(0, 0, 0, 0.18);
+  background-color: #ffffff; /* Add background color */
+  padding: 10px; /* Add padding */
+}
+
+.sticky-bottom .card {
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+/* Added CSS for vertical alignment */
+.button-container {
+  display: flex;
+
+}
+
+.button-container .btn {
+  margin: 5px; /* Adjust margin */
+}
+</style>
+<div class="card text-center">
+  <div class="card-body">
+    <h5 class="card-title">Jami:<p class="card-text" id="total-price">{{ cart.get_total_products_price }} so'm</p> <br></h5>
+    {% if table %}
+    <h5 class="card-title">Stol: #{{table.number}}</h5>
+    {% endif %}
+    <!-- Display the total sum of prices using template tags -->
+    
+    <p class="card-text">
+      <div class="button-container">
+        <form action="{% url "orders:make_order" %}" method="post"> {% csrf_token %}
+          <input type="hidden" name="kitchen_id" value="{{ kitchen.id }}">
+          {% if get_orders %}
+          <button type="submit" class="btn btn-primary" >Buyurtma berish <i class="fas fa-check-square"></i></button>
+          {% endif %}
+          <button type="button" class="btn btn-danger" onclick="clearCart()"><div class="fas fa-trash"></div></button>
+        </form>
+      </div>
+    </p>
+  </div>
+</div>
+
+
+
+
+<div class="container container1">
+  {% for item in cart %}
+  <div class="card item" id="cart-item-{{ item.product_id }}">
+    <img src="{{ item.image }}" class="card-img-top" alt="...">
+    <div class="card-body">
+      <div class="text-section">
+        <h5 class="card-title">{{ item.name }}</h5>
+        <div class="input-group">
+          <button class="btn btn-outline-secondary remove-from-cart" onclick="removeFromCart('{{ item.product_id }}')">-</button>
+          <input id="quantity-{{ item.product_id }}" type="text" class="form-control" value="{{ item.quantity }}" aria-label="Quantity" readonly>
+          <button class="btn btn-outline-secondary add-to-cart" onclick="addToCart('{{ item.product_id }}')">+</button>
+        </div>
+      </div>
+      <div class="cta-section">
+        <div id="price-{{ item.product_id }}">{{item.quantity}} x {{item.price}} = {{ item.total_price }} so'm</div>
+        <a href="#" class="btn btn-light" onclick="deleteItem('{{ item.product_id }}')"><i class="fas fa-trash text-danger"></i></a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+
+
+
+<nav class="navbar fixed-bottom bottom-navbar navbar-expand-lg navbar-light bg-light pt-0">
+  <div class="container-fluid">
+      <a class="nav-link" href="{% url "main:menu" kitchen.slug %}"><i class="fas fa-home navbar-icon"></i><span class="d-none d-lg-inline">Kategoriyalar</span></a>
+      <a class="nav-link" href="{% url "main:foods" kitchen.slug %}"><i class="fas fa-utensils navbar-icon"></i><span class="d-none d-lg-inline"> Taomlar</span></a>
+      <a class="nav-link" href="{% url 'cart:cart' kitchen.id %}"><i class="fas fa-shopping-cart navbar-icon"></i><span class="d-none d-lg-inline"> Savatcha</span></a>
+      <a class="nav-link" href="{% url "main:kitchen_info" kitchen.slug %}"><i class="fas fa-info-circle navbar-icon"></i></i></i><span class="d-none d-lg-inline">Ma'lumot</span></a>
+      <a class="nav-link" href="{% url "review:kitchen" kitchen.id %}"><i class="fas fa-comments navbar-icon"></i></i><span class="d-none d-lg-inline"> Sharhlar</span></a>
+  </div>
+</nav>
+
+<script>
+  function formatPrice(price) {
+    // Convert price to string and split it into parts for thousands separation
+    const parts = price.toString().split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " "); // Add space as thousands separator
+
+    // Join the parts back together and return the formatted price
+    return parts.join(".");
+}
+
+function addToCart(productId) {
+    $.ajax({
+      url: '{% url "cart:add_cart" %}',
+      method: 'POST',
+      headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+      contentType: 'application/json',
+      data: JSON.stringify({ product_id: productId, kitchen_id: {{kitchen.id}}}),
+      success: function(response) {
+        console.log(response.cart);
+        // Update quantity and price in UI
+        $('#quantity-' + productId).val(response.cart[productId].quantity);
+        $('#price-' + productId).text(formatPrice(response.cart[productId].quantity * response.cart[productId].price) + ' so\'m');
+        // Update total price in summary section
+        $('#total-price').text(formatPrice(response.total_price) + ' so\'m');
+      },
+      error: function(xhr, status, error) {
+        console.error('Failed to add product to cart:', error);
+      }
+    });
+}
+
+function removeFromCart(productId) {
+    $.ajax({
+      url: '{% url "cart:decrement_cart" %}',
+      method: 'POST',
+      headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+      contentType: 'application/json',
+      data: JSON.stringify({ product_id: productId, kitchen_id: {{kitchen.id}}}),
+      success: function(response) {
+        // Update quantity and price in UI
+        if (!response.cart[productId]) {
+          console.log("Removing product from cart")
+          $('#cart-item-' + productId).remove(); // Remove the card from UI
+        } else {
+          $('#quantity-' + productId).val(response.cart[productId].quantity);
+          $('#price-' + productId).text(formatPrice(response.cart[productId].quantity * response.cart[productId].price) + ' so\'m');
+        }
+        // Update total price in summary section
+        $('#total-price').text(formatPrice(response.total_price) + ' so\'m');
+      },
+      error: function(xhr, status, error) {
+        console.error('Failed to remove product from cart:', error);
+      }
+    });
+}
+
+function deleteItem(productId) {
+    $.ajax({
+      url: '{% url "cart:remove_cart" %}',
+      method: 'POST',
+      headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+      contentType: 'application/json',
+      data: JSON.stringify({ product_id: productId, kitchen_id: {{kitchen.id}}}),
+      success: function(response) {
+        console.log(response.cart);
+        // Update quantity and price in UI
+        if (!response.cart[productId]) {
+          $('#cart-item-' + productId).remove(); // Remove the card from UI
+        } else {
+          $('#quantity-' + productId).val(response.cart[productId].quantity);
+          $('#price-' + productId).text(formatPrice(response.cart[productId].quantity * response.cart[productId].price) + ' so\'m');
+        }
+        // Update total price in summary section
+        $('#total-price').text(formatPrice(response.total_price) + ' so\'m');
+      },
+      error: function(xhr, status, error) {
+        console.error('Failed to remove product from cart:', error);
+      }
+    });
+}
+
+function clearCart() {
+    $.ajax({
+      url: '{% url "cart:clear_cart" %}',
+      method: 'POST',
+      headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+      contentType: 'application/json',
+      data: JSON.stringify({ kitchen_id: {{kitchen.id}} }),
+      success: function(response) {
+        console.log(response.cart);
+        // Remove all cards from UI
+        $('.item').remove();
+        // Update total price in summary section
+        $('#total-price').text(formatPrice(0) + ' so\'m');
+      },
+      error: function(xhr, status, error) {
+        console.error('Failed to clear cart:', error);
+      }
+    });
+    // Update total price in summary section immediately after clearing the cart
+    $('#total-price').text('0 so\'m');
+}
+
+function buyNow() {
+    // Handle buy now functionality
+}
+$(document).ready(function() {
+  // Format initial total price
+  var initialTotalPrice = $('#total-price').text().trim();
+  $('#total-price').text(formatPrice(initialTotalPrice));
+
+  // Format initial prices for each item in the cart
+  $('.item').each(function() {
+      var productId = $(this).attr('id').split('-')[2];
+      var initialItemPrice = $('#price-' + productId).text().trim().split('=')[1];
+      $('#price-' + productId).text(formatPrice(initialItemPrice));
+  });
+});
+</script>
+{% endblock content %}

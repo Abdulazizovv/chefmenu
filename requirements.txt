@@ -1,0 +1,14 @@
+aiogram==2.14.3
+channels==3.0.4
+django-libsass==0.9
+django-sass-processor==1.2.2
+djangorestframework==3.15.1
+environs==11.0.0
+pillow==10.2.0
+pip-chill==1.0.3
+psycopg2-binary==2.9.9
+pyopenssl==24.1.0
+qrcode==7.4.2
+service-identity==24.1.0
+zope.interface==6.3
+gunicorn

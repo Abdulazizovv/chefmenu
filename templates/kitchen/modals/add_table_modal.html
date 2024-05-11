@@ -1,0 +1,24 @@
+<!-- Modal for adding a table -->
+<div class="modal fade" id="addTableModal" tabindex="-1" aria-labelledby="addTableModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTableModalLabel">Stol qo'shish</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="table_number" class="form-label">Stollar soni:</label>
+                        <input type="number" class="form-control" id="table_number" name="table_number" min="1" value="1" required>
+                        <div class="invalid-feedback">
+                            Noto'g'ri qiymat kiritildi!
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-3">Qo'shish</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,56 @@
+{% extends "kitchen/base.html" %}
+
+{% block title %}
+Profil
+{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <img src="{{request.user.profile.picture.url}}" class="img-fluid rounded-circle mb-3" alt="User Image">
+                    <h5 class="card-title">{{request.user.full_name}}</h5>
+                    <p class="card-text">Telefon raqam: {{request.user.phone_number}}</p>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editProfileModal"><i class="fas fa-edit"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProfileModalLabel">Ma'lumotlarni tahrilash</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST"> {% csrf_token %}
+                    <div class="form-group">
+                        <label for="name">Ism</label>
+                        <input type="text" class="form-control" name="name" value="{{request.user.full_name}}">
+                    </div>
+                    {% comment %} <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="text" class="form-control" id="phone" value="1234567890">
+                    </div> {% endcomment %}
+                    <div class="form-group">
+                        <label for="user-image">Surat</label>
+                        <input type="file" class="form-control" name="image">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiqish</button>
+                <button type="button" class="btn btn-primary">Saqlash</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

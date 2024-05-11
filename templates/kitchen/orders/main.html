@@ -1,0 +1,128 @@
+{% extends "kitchen/base.html" %}
+{% load uzbek_timesince %}
+
+{% block title %}
+Buyurtmalar
+{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center my-4">Buyurtmalar</h1>
+    <div class="row justify-content-center">
+        <div class="buttons-container">
+            <div class="row justify-content-center">
+            <div class="col-md-6 text-center">
+                <button href="" class="btn btn-primary py-2 px-1 mb-2" data-toggle="modal" data-target="#selectTable">Yangi buyurtma <i class="fas fa-plus"></i></button>
+            </div>
+            <div class="col-md-6 text-center">
+                <a href="" class="btn btn-primary py-2 px-1 mb-2">Yangilash<i class="fas fa-sync-alt"></i></a>
+            </div>
+            </div>
+        </div>
+        {% for order in orders %}
+        <div class="col-md-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    Buyurtma Raqami: #{{ order.id }}
+                </div>
+                
+                <div class="card-body">
+                    <h5 class="card-title">Buyurtma Holati: 
+                        {% if order.status == "new" %}
+                        <span class="badge badge-pill badge-success">Yangi</span>
+                        {% elif order.status == "in_progress" %}
+                        <span class="badge badge-pill badge-warning">Jarayonda</span>
+                        {% elif order.status == "done" %}
+                        <span class="badge badge-pill badge-dark">Yakunlandi</span>
+                        {% endif %}
+                    </h5>
+                    <p class="card-text">Buyurtma Vaqti: {{ order.created|uzbek_timesince }}</p>
+                    <ul class="list-group list-group-light">
+                        {% for item in order.foods.all %}
+                        <li class="list-group-item px-3">{{ item.food.name }} - x{{ item.quantity }}</li>
+                        {% endfor %}
+                    </ul>
+
+                </div>
+                <div class="card-footer text-muted">
+                    
+                    {% if order.status == "new" %}
+                    <form method="post" action="{% url 'orders:change_order_status' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="order_id" value={{order.id}}>
+                        <input type="hidden" name="status" value="in_progress">
+                        <button type="submit" class="btn btn-primary">Qabul qilish</button>
+                    </form>
+                    {% elif order.status == "in_progress" %}
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        Yakunlash
+                    </button>
+                    
+                    <div class="modal fade" tabindex="-1" id="exampleModal" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">Buyurtmani yakunlash</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>
+                                    Buyurtma yakunlashni tasdiqlash
+                                </p>
+                                <form method="post" action="{% url 'orders:change_order_status' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="order_id" value={{order.id}}>
+                                    <input type="hidden" name="status" value="done">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-subtle" data-bs-dismiss="modal">Bekor qilish</button>
+                                    <button type="submit" class="btn btn-primary">Ha</button>
+                                </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center">Hozircha hech qanday buyurtma yo'q</p>
+        {% endfor %}
+    </div>
+</div>
+
+
+
+
+<div class="modal fade" id="selectTable" tabindex="-1" role="dialog" aria-labelledby="selectTableModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="selectTableModalLabel">Yangi buyurtma yaratish</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="table">Stolni tanlang</label>
+                        <select class="form-control" id="table" name="table" required>
+                            <option value="" selected disabled>Stolni tanlang</option>
+                            {% for table in tables %}
+                            <option value="{{ table.table_unique_id }}">{{ table.number }}</option>
+                            {% endfor %}
+                        </select>
+                        <button class="btn btn-primary mt-3 mb-3" type="submit">Keyingisi <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+
+{% endblock content %}

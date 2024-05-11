@@ -1,0 +1,120 @@
+{% extends "main/base.html" %}
+
+{% block title %}
+{{ kitchen.title }} | Menu
+{% endblock title %}
+
+{% block content %}
+<style>
+    .menu-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .menu-header h1 {
+        font-size: 36px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .menu-header p {
+        font-size: 18px;
+        color: #666;
+    }
+
+    .category {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .category img {
+        width: 100%;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .category h2 {
+        font-size: 24px;
+        margin-top: 0;
+        color: #333;
+    }
+
+    .category p {
+        font-size: 18px;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .category span {
+        display: block;
+        font-size: 20px;
+        font-weight: bold;
+        color: #f90;
+    }
+
+    .square-category {
+        display: flex;
+        align-items: center;
+    }
+
+    .square-category img {
+        width: 120px;
+        height: 120px;
+        border-radius: 8px;
+        margin-right: 20px;
+    }
+</style>
+
+<div class="container pb-5">
+    <div class="menu-header">
+        <h1>Food Menu</h1>
+        <p>Most Popular Items</p>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="category">
+                <img src="https://via.placeholder.com/200" alt="Food Image">
+                <h2>Chicken Burger</h2>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+                <span>$115</span>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="category">
+                <img src="https://via.placeholder.com/200" alt="Food Image">
+                <h2>Chicken Burger</h2>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+                <span>$115</span>
+            </div>
+        </div>
+        <!-- Repeat this for each category -->
+    </div>
+    <button onclick="toggleCategoryStyle()">Toggle Category Style</button>
+</div>
+
+
+<nav class="navbar fixed-bottom bottom-navbar navbar-expand-lg navbar-light bg-light mt-3">
+    <div class="container-fluid">
+        <a class="nav-link" href="#"><i class="fas fa-home navbar-icon"></i><span class="d-none d-lg-inline"> Home</span></a>
+        <a class="nav-link" href="#"><i class="fas fa-utensils navbar-icon"></i><span class="d-none d-lg-inline"> Restaurants</span></a>
+        <a class="nav-link" href="#"><i class="fas fa-shopping-cart navbar-icon"></i><span class="d-none d-lg-inline"> Cart</span></a>
+        <a class="nav-link" href="#"><i class="fas fa-phone-alt navbar-icon"></i><span class="d-none d-lg-inline"> Contact</span></a>
+        <a class="nav-link" href="#"><i class="fas fa-user navbar-icon"></i><span class="d-none d-lg-inline"> Profile</span></a>
+    </div>
+</nav>
+
+
+
+<script>
+    function toggleCategoryStyle() {
+        var categories = document.querySelectorAll('.category');
+        categories.forEach(function (category) {
+            category.classList.toggle('square-category');
+        });
+    }
+</script>
+
+{% endblock content %}

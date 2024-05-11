@@ -1,0 +1,138 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% comment %} <script src="https://kit.fontawesome.com/b67c8e9692.js" crossorigin="anonymous"></script> {% endcomment %}
+    <link rel="stylesheet" href="{% static "kitchen/vendor/fontawesome-free/css/all.min.css" %}">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700,900&display=swap" rel="stylesheet">
+
+    {% include "main/links.html" %}
+    <title>{% block title %}{% endblock title %}</title>
+    {% block head %}{% endblock head %}
+</head>
+<body>
+
+    <style>
+    /* Customize styles here */
+    body {
+        background-color: #f8f9fa;
+    }
+    .navbar {
+        background-color: #ffffff;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .navbar-brand {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+    }
+    .btn-primary {
+        background-color: #ff6b6b;
+        border-color: #ff6b6b;
+    }
+    .btn-primary:hover {
+        background-color: #ff8474;
+        border-color: #ff8474;
+    }
+    .bottom-navbar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #ffffff;
+        box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
+        z-index: 1030; /* Adjust to overlay other content */
+    }
+    .bottom-navbar .nav-link {
+        padding: 10px;
+        color: #333;
+        text-align: center;
+        flex-grow: 1;
+    }
+    .navbar-icon {
+        font-size: 1.5rem;
+    }
+
+    .alert {
+		position: relative;
+	}
+	
+	.alert-info {
+		background-color: #cce5ff;
+		color: #004085;
+		border-color: #b8daff;
+	}
+	
+	.alert-info .close {
+		color: #004085;
+	}
+	
+	.alert-info .close:hover {
+		color: #002752;
+	}
+	
+	/* Add margin to top */
+	.mt-3 {
+		margin-top: 1rem;
+	}
+    </style>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">ChefMenu</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/' %} active{% endif %}" href="/" aria-current="page" href="#">Bosh sahifa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/about/' %} active{% endif %}" href="{% url "main:about" %}">Biz haqimizda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/contact/' %} active{% endif %}" href="{% url "main:contact" %}">Bog'lanish</a>
+                    </li>
+                    {% if request.user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url "main:user_profile" %}">Profil</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url "main:login" %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url "main:register" %}">Ro'yxatdan o'tish</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {% if messages %}
+        <div class="container mt-3">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    {% for message in messages %}
+                    <div class="alert {{message.tags}} alert-dismissible fade show" role="alert">
+                        {{message|safe}}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% block content %}{% endblock content %}
+    
+
+    <script src="{% static "js/bootstrap/main.js" %}"></script>
+</body>
+</html>
