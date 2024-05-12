@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     #3rd party apps
     'rest_framework',
     # 'channels',
+    'storages',
 
     #local apps
     'users',
@@ -151,12 +152,28 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR.joinpath('staticfiles')
-STATICFILES_DIRS = [
-    BASE_DIR.joinpath('static')
+# STATIC_URL = 'static/'
+# STATIC_ROOT = BASE_DIR.joinpath('staticfiles')
+# STATICFILES_DIRS = [
+#     BASE_DIR.joinpath('static')
 
+# ]
+
+AWS_ACCESS_KEY_ID = env.str("ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = env.str("ACCESS_SECRET_KEY")
+AWS_STORAGE_BUCKET_NAME = 'chefmenu'
+AWS_S3_ENDPOINT_URL = 'https://chefmenu.nyc3.digitaloceanspaces.com'
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_LOCATION = 'chefmenu'
+
+STATICFILES_DIRS = [
+    BASE_DIR.joinpath('staticfiles')
 ]
+STATIC_URL = 'https://%s/%s/' % (AWS_S3_ENDPOINT_URL, AWS_LOCATION)
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR.joinpath('media')
