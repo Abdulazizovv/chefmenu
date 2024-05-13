@@ -27,7 +27,7 @@ class VerificationCode(models.Model):
 class FoodCategory(models.Model):
     kitchen = models.ForeignKey(Kitchen, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, max_length=500)
     
     def __str__(self) -> str:
         return self.title

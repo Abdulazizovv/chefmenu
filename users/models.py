@@ -58,7 +58,7 @@ class Kitchen(models.Model):
     info = models.TextField(null=True, blank=True)
     address = models.CharField(max_length=255, default="", null=True, blank=True)
     rate = models.FloatField(default=0.0)
-    slug = models.SlugField(unique=True, unique_for_date='created')
+    slug = models.SlugField(unique=True, unique_for_date='created', max_length=500)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=False)
